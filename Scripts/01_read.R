@@ -119,7 +119,7 @@ for( i in 1: length( list_data)){
   data_Aux$total_response_time <- rm()
   print("==================================================================")
   (data_Aux$response_time_bienvenida[ nrow(data_Aux)]/100/60) %>% round(2) %>% paste("Welcome Time",. ,"minits") %>% print
-  Times[ i, 3] <- (data_Aux$response_time_bienvenida[ nrow(data_Aux)]/100/60) %>% round(2) 
+  Times[ i, 3] <- (data_Aux$response_time_bienvenida[ nrow(data_Aux)]/1000/60) %>% round(2) 
   Times[ i ,4] <- data_Aux$Group[ nrow(data_Aux)]
   data_Aux$response_time_bienvenida <- rm()
   print("==================================================================")
@@ -150,10 +150,10 @@ data$correct <- data$correct %>%  as.character %>% as.numeric
 
 
 # S save ------------------------------------------------------------------
-# save(data, file = "RData/00_read_prepare_data.RData")
+save(data, file = "RData/00_read_prepare_data.RData")
 # E save ------------------------------------------------------------------
 
 Times
-Times %>% 
-  write.table(x = ., file = "clipboard", sep = ";", dec = ",", row.names = FALSE    )
+# Times %>% 
+#   write.table(x = ., file = "clipboard", sep = ";", dec = ",", row.names = FALSE    )
   

@@ -10,12 +10,18 @@ list <-  list(
   
   ncol_experiment_01 = 230, # Numero de columnas que tiene el experimento
   
+  blockAtributo_01 = c(1, 3),
+  NombreBlock_vector_01 = 1:4,
+  NombreBlock_names_01 = c("ActionF-Pos","ActionF-Neg","ActionR-Pos","ActionR-Neg"),
+  variables_guardadas_01 = c("Subject", "correct", "block", "sexo", "target", "tipo", "block2", "response_time", "Group"),
+  
   seet_seed = 11234, # 112345
   min_RT = 300,
   max_RT = 3000,
   IQR_prod = 1.5,
   correct_only = FALSE,             # Si quremeos solo las repuestas correctas
   Ratio_response_Block = 0.8,
+  
   
   only_sex = FALSE,               # Solo sexo o sexo + couple
   
