@@ -20,13 +20,13 @@ list <-  list(
   max_RT = 3000,
   IQR_prod = 1.5,
   correct_only_01 = FALSE,             # Si quremeos solo las repuestas correctas
-  Ratio_response_Block_01 = 0.55,
+  Ratio_response_Block_01 = 0.7,
   
   
   balance_num_01 = TRUE,               # Solo sexo o sexo + couple
   
-  n_per_group_TDC = 20,
-  n_per_group_control = 20,
+  n_per_group_TDC = 29,
+  n_per_group_control = 22,
   
   Subject_2_Study = TRUE,          # Seleccionamos solo los que cumplen los criterios. (80% )
   Out_rt_300_3000 = FALSE,

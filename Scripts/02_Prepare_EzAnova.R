@@ -52,7 +52,7 @@ dataDT <-
   data[ data$trial_order != 1, 
                 list_script$variables_guardadas_01] %>% data.table
 # dataDT %>%  summary
-
+save(dataDT, file = "RData/02_01_check_accuracy_ratio.RData")
 ######################################
 #### OUT data checks
 ######################################
@@ -93,8 +93,11 @@ row.names(Ranges) <- rm()
 ######################################
 #### Out people with less than 80% ratio
 ######################################
-CheckSubjects <- dataDT[, list( Subject = Subject[1], Group = Group[1] , mean_correct = mean(correct)),
-                        by = paste(dataDT$Subject, dataDT$block) ]
+CheckSubjects <-
+  # dataDT[, list( Subject = Subject[1], Group = Group[1] , mean_correct = mean(correct)),
+  #        by = paste(dataDT$Subject, dataDT$block) ]
+  dataDT[, list( Subject = Subject[1], Group = Group[1] , mean_correct = mean(correct)),
+         by = paste(dataDT$Subject) ]
 CheckSubjects$Subject[ CheckSubjects$mean_correct < list_script$Ratio_response_Block ] %>% table
 # CheckSubjects[ CheckSubjects$mean_correct < list_script$Ratio_response_Block ,]
 SubjectsFailAccuracyRatio <- 
@@ -210,80 +213,80 @@ if( list_script$Error_plus_Subject_600 ==  TRUE){# Borg 2010 (Basado en pero no 
 ################
 # Compute values
 ################
-dataDT_ez <- dcast( formula = Subject ~  block2 + tipo ,data = dataDTcorrect , fun = function(x){
-  mean(x, na.rm = TRUE)
-  } , value.var="response_time")
-
-dataDT_ez_merge_log <- dcast( formula = Subject ~  block2 + tipo ,data = dataDTcorrect , fun = function(x){
-  mean( log (x) , na.rm = TRUE)
-} , value.var="response_time")
-setnames(x = dataDT_ez_merge_log , old = dataDT_ez_merge_log %>%  names, new = dataDT_ez_merge_log %>%
-           names %>%  paste(. , "log", sep = "_" ) )
-
-
-dataDT_ez_merge_z <- dcast( formula = Subject ~  block2 + tipo ,data = dataDTcorrect , fun = function(x){
-  mean( scale (x) , na.rm = TRUE)
-} , value.var="response_time")
-setnames(x = dataDT_ez_merge_z , old = dataDT_ez_merge_z %>%  names, new = dataDT_ez_merge_z %>%
-           names %>%  paste(. , "z", sep = "_" ) )
-
-
-
-
-# Computo la D measure
-dataDT_ez_sd <- dcast( formula = Subject ~  tipo ,data = dataDTcorrect[ tipo2 == "Interf",] , fun = function(x){
-  sd(x, na.rm = TRUE)
-} , value.var="response_time")
-
-dataDT_ez_log_sd <- dcast( formula = Subject ~  tipo ,data = dataDTcorrect[ tipo2 == "Interf",] , fun = function(x){
-  sd(log(x), na.rm = TRUE)
-} , value.var="response_time")
-
-
-
-if( list_script$interfernce_union == TRUE){ # Elijo como hago el analisis
-  dataDT_ez_merge_D <- data.table(
-    Subject =  dataDT_ez$Subject,
-    D_D_D =
-      ( dataDT_ez$`Help-FB_Interf`  - dataDT_ez$`Sex-FB_Interf`) /
-      dataDT_ez_sd$Interf
-  )
-  # dataDT_ez_merge_D2 <- data.table( 
-  #   Subject =  dataDT_ez_merge_log$Subject,
-  #   D_D_D =
-  #     ( dataDT_ez_merge_log$`Help-FB_Interf`  - dataDT_ez_merge_log$`Sex-FB_Interf`) / 
-  #     dataDT_ez_log_sd$Interf
-  # )
-}else{
-#  Por hacer
-}
-################
-# Merge all
-################
-dataDT_ez <- merge(x = dataDT_ez, y = dataDT_ez_merge_z, by.x = "Subject", by.y = "Subject_z")
-dataDT_ez <- merge(x = dataDT_ez, y = dataDT_ez_merge_log, by.x = "Subject", by.y = "Subject_log")
-dataDT_ez <- merge(x = dataDT_ez, y = dataDT_ez_merge_D, by.x = "Subject", by.y = "Subject")
-
-dataDT_ez <- melt(data = dataDT_ez, id.vars="Subject")
-
-dataDT_ez$Block <-
-  dataDT_ez$variable %>%  as.character %>%  strsplit( "_") %>%
-  lapply(FUN = function(x){x[1]}) %>%  unlist
-dataDT_ez$Type <-
-  dataDT_ez$variable %>%  as.character %>%  strsplit( "_") %>%
-  lapply(FUN = function(x){x[2]}) %>%  unlist
-dataDT_ez$measure <-
-  dataDT_ez$variable %>%  as.character %>%  strsplit( "_") %>%
-  lapply(FUN = function(x){x[3]}) %>%  unlist
-dataDT_ez$measure <- ifelse(test = is.na(dataDT_ez$measure), yes = "RT", no =  dataDT_ez$measure )
-
-dataSubjectSexo <-
-  dataDT[ , list(Sex = sexo[1], Couple = pareja[1]), by =Subject ]
-dataDT_ez <- merge(x = dataDT_ez, y = dataSubjectSexo, by = "Subject", all.x = TRUE, all.y = FALSE )
-dataDT_ez$Block <- dataDT_ez$Block %>%  factor
-
-dataDT_ez$variable <- dataDT_ez$variable %>%  as.character %>% gsub("_z" , "", .) %>%
-  gsub("_log" , "", .) %>% gsub("_D" , "", .) %>%  as.factor
+# dataDT_ez <- dcast( formula = Subject ~  block2 + tipo ,data = dataDTcorrect , fun = function(x){
+#   mean(x, na.rm = TRUE)
+#   } , value.var="response_time")
+# 
+# dataDT_ez_merge_log <- dcast( formula = Subject ~  block2 + tipo ,data = dataDTcorrect , fun = function(x){
+#   mean( log (x) , na.rm = TRUE)
+# } , value.var="response_time")
+# setnames(x = dataDT_ez_merge_log , old = dataDT_ez_merge_log %>%  names, new = dataDT_ez_merge_log %>%
+#            names %>%  paste(. , "log", sep = "_" ) )
+# 
+# 
+# dataDT_ez_merge_z <- dcast( formula = Subject ~  block2 + tipo ,data = dataDTcorrect , fun = function(x){
+#   mean( scale (x) , na.rm = TRUE)
+# } , value.var="response_time")
+# setnames(x = dataDT_ez_merge_z , old = dataDT_ez_merge_z %>%  names, new = dataDT_ez_merge_z %>%
+#            names %>%  paste(. , "z", sep = "_" ) )
+# 
+# 
+# 
+# 
+# # Computo la D measure
+# dataDT_ez_sd <- dcast( formula = Subject ~  tipo ,data = dataDTcorrect[ tipo2 == "Interf",] , fun = function(x){
+#   sd(x, na.rm = TRUE)
+# } , value.var="response_time")
+# 
+# dataDT_ez_log_sd <- dcast( formula = Subject ~  tipo ,data = dataDTcorrect[ tipo2 == "Interf",] , fun = function(x){
+#   sd(log(x), na.rm = TRUE)
+# } , value.var="response_time")
+# 
+# 
+# 
+# if( list_script$interfernce_union == TRUE){ # Elijo como hago el analisis
+#   dataDT_ez_merge_D <- data.table(
+#     Subject =  dataDT_ez$Subject,
+#     D_D_D =
+#       ( dataDT_ez$`Help-FB_Interf`  - dataDT_ez$`Sex-FB_Interf`) /
+#       dataDT_ez_sd$Interf
+#   )
+#   # dataDT_ez_merge_D2 <- data.table( 
+#   #   Subject =  dataDT_ez_merge_log$Subject,
+#   #   D_D_D =
+#   #     ( dataDT_ez_merge_log$`Help-FB_Interf`  - dataDT_ez_merge_log$`Sex-FB_Interf`) / 
+#   #     dataDT_ez_log_sd$Interf
+#   # )
+# }else{
+# #  Por hacer
+# }
+# ################
+# # Merge all
+# ################
+# dataDT_ez <- merge(x = dataDT_ez, y = dataDT_ez_merge_z, by.x = "Subject", by.y = "Subject_z")
+# dataDT_ez <- merge(x = dataDT_ez, y = dataDT_ez_merge_log, by.x = "Subject", by.y = "Subject_log")
+# dataDT_ez <- merge(x = dataDT_ez, y = dataDT_ez_merge_D, by.x = "Subject", by.y = "Subject")
+# 
+# dataDT_ez <- melt(data = dataDT_ez, id.vars="Subject")
+# 
+# dataDT_ez$Block <-
+#   dataDT_ez$variable %>%  as.character %>%  strsplit( "_") %>%
+#   lapply(FUN = function(x){x[1]}) %>%  unlist
+# dataDT_ez$Type <-
+#   dataDT_ez$variable %>%  as.character %>%  strsplit( "_") %>%
+#   lapply(FUN = function(x){x[2]}) %>%  unlist
+# dataDT_ez$measure <-
+#   dataDT_ez$variable %>%  as.character %>%  strsplit( "_") %>%
+#   lapply(FUN = function(x){x[3]}) %>%  unlist
+# dataDT_ez$measure <- ifelse(test = is.na(dataDT_ez$measure), yes = "RT", no =  dataDT_ez$measure )
+# 
+# dataSubjectSexo <-
+#   dataDT[ , list(Sex = sexo[1], Couple = pareja[1]), by =Subject ]
+# dataDT_ez <- merge(x = dataDT_ez, y = dataSubjectSexo, by = "Subject", all.x = TRUE, all.y = FALSE )
+# dataDT_ez$Block <- dataDT_ez$Block %>%  factor
+# 
+# dataDT_ez$variable <- dataDT_ez$variable %>%  as.character %>% gsub("_z" , "", .) %>%
+#   gsub("_log" , "", .) %>% gsub("_D" , "", .) %>%  as.factor
 
 
 
@@ -315,8 +318,8 @@ dataDT_ez$variable <- dataDT_ez$variable %>%  as.character %>% gsub("_z" , "", .
 
 
 
-save(dataDT_ez, dataDTcorrect, file = "RData/03_Prepare_EzAnova.RData")
-CheckSubjects
-SubjectsFailAccuracyRatio
-Subject_2_Study
-write.table(dataDT_ez, file = "Results/Con_tipo.csv")
+# save(dataDT_ez, dataDTcorrect, file = "RData/03_Prepare_EzAnova.RData")
+# CheckSubjects
+# SubjectsFailAccuracyRatio
+# Subject_2_Study
+# write.table(dataDT_ez, file = "Results/Con_tipo.csv")
