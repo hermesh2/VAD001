@@ -141,7 +141,6 @@ data$height <-rm()
 data$width <- rm()
 data$tipo <-data$tipo %>% factor() 
 data$tipo %>% table
-data$tipo[data$tipo == "SEX"] <- "SEXO"
 data$tipo <- data$tipo %>%  factor
 data$target %>%  table
 data$target <- data$target %>%  factor
