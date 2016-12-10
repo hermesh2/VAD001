@@ -19,19 +19,14 @@ list <-  list(
   min_RT = 300,
   max_RT = 3000,
   IQR_prod = 1.5,
-  correct_only = FALSE,             # Si quremeos solo las repuestas correctas
-  Ratio_response_Block = 0.8,
+  correct_only_01 = FALSE,             # Si quremeos solo las repuestas correctas
+  Ratio_response_Block_01 = 0.55,
   
   
-  only_sex = FALSE,               # Solo sexo o sexo + couple
+  balance_num_01 = TRUE,               # Solo sexo o sexo + couple
   
-  n_per_sex_men = 50,
-  n_per_sex_women = 50,
-  
-  n_per_sex_men_pareja = 25,
-  n_per_sex_men_no_pareja = 25,
-  n_per_sex_women_pareja = 25,
-  n_per_sex_women_no_pareja = 25,
+  n_per_group_TDC = 20,
+  n_per_group_control = 20,
   
   Subject_2_Study = TRUE,          # Seleccionamos solo los que cumplen los criterios. (80% )
   Out_rt_300_3000 = FALSE,
@@ -48,5 +43,6 @@ list <-  list(
 )
 writeLines(text = toJSON(list), con = "Data/00_Initial.json")
 
+source("Scripts/02_Prepare_EzAnova.R")
 # source("Scripts/03_Prepare_EzAnova.R")
 # source("Scripts/04_ezANOVA.R")

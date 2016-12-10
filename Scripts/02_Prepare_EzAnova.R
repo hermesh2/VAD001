@@ -61,7 +61,7 @@ dataDT$correct %>% table %>%  prop.table
 (dataDT$response_time <= list_script$min_RT ) %>%  table %>%  prop.table # Miramos los que tienen menos 300 msec
 (dataDT$response_time >= list_script$max_RT ) %>%  table %>%  prop.table # Miramos los que tienen mas 3000 msec
 
-if(list_script$correct_only == TRUE){
+if(list_script$correct_only_01 == TRUE){
   dataDTcorrect <- dataDT[ dataDT$correct == 1, ] # Only the correct answer  
 }else{
   dataDTcorrect <- dataDT
@@ -93,12 +93,15 @@ row.names(Ranges) <- rm()
 ######################################
 #### Out people with less than 80% ratio
 ######################################
-CheckSubjects <- dataDT[, list( Subject = Subject[1], sexo = sexo[1], pareja = pareja[1], mean_correct = mean(correct)),
+CheckSubjects <- dataDT[, list( Subject = Subject[1], Group = Group[1] , mean_correct = mean(correct)),
                         by = paste(dataDT$Subject, dataDT$block) ]
 CheckSubjects$Subject[ CheckSubjects$mean_correct < list_script$Ratio_response_Block ] %>% table
 # CheckSubjects[ CheckSubjects$mean_correct < list_script$Ratio_response_Block ,]
 SubjectsFailAccuracyRatio <- 
   CheckSubjects$Subject[ CheckSubjects$mean_correct < list_script$Ratio_response_Block] %>% unique
+
+# CheckSubjects$Subject[ CheckSubjects$mean_correct < 0.6] %>% unique %>%  length()
+# CheckSubjects %>% write.table(file = "Results/01_ratios_acierto_sujeto.csv", sep = ";", dec = ",", row.names = FALSE)
 # E Prepare data ----------------------------------------------------------
 
 
@@ -108,51 +111,17 @@ SubjectsFailAccuracyRatio <-
 #### Selected Per Study
 ######################################
 set.seed(list_script$seet_seed)
-if( list_script$only_sex == TRUE){
-  Subject_2_Study <- c( dataDTcorrect$Subject[ dataDTcorrect$sexo == "Mujer" &   # Selecciono mujeres
+if( list_script$balance_num_01 == TRUE){
+  Subject_2_Study <- c( dataDTcorrect$Subject[ dataDTcorrect$Group == "Grupo control" &   # Selecciono mujeres
                                                  !(dataDTcorrect$Subject %in% SubjectsFailAccuracyRatio)] %>%
                           unique %>%  as.character %>% 
-                          sample( size = list_script$n_per_sex_women, replace = FALSE) ,
-                        dataDTcorrect$Subject[ dataDTcorrect$sexo == "Hombre" & # Selecciono hombres
+                          sample( size = list_script$n_per_group_control, replace = FALSE) ,
+                        
+                        dataDTcorrect$Subject[ dataDTcorrect$Group == "TDC" & # Selecciono hombres
                                                  !(dataDTcorrect$Subject %in% SubjectsFailAccuracyRatio)] %>%
                           unique %>% as.character  %>% 
-                          sample( size = list_script$n_per_sex_men, replace = FALSE)
+                          sample( size = list_script$n_per_group_TDC, replace = FALSE)
   )
-  dataDTcorrect$Subject_2_Study <- ifelse( test = dataDTcorrect$Subject %in% Subject_2_Study, 
-                                           yes = 1, no = 0)
-  
-}else{
-                      ######################################3
-                      # Muejers con pareja  
-  Subject_2_Study <- c( dataDTcorrect$Subject[ dataDTcorrect$sexo == "Mujer" &   # Selecciono mujeres
-                                                 dataDTcorrect$pareja == "YES" &
-                                                 !(dataDTcorrect$Subject %in% SubjectsFailAccuracyRatio)] %>%
-                          unique %>%  as.character %>% 
-                          sample( size = list_script$n_per_sex_women_pareja, replace = FALSE) ,
-                        ######################################3  
-                        # Mujeres sin pareja  
-                        dataDTcorrect$Subject[ dataDTcorrect$sexo == "Mujer" &   # Selecciono mujeres
-                                                 dataDTcorrect$pareja == "NO" &
-                                               !(dataDTcorrect$Subject %in% SubjectsFailAccuracyRatio)] %>%
-                          unique %>%  as.character %>% 
-                          sample( size = list_script$n_per_sex_women_no_pareja, replace = FALSE) ,
-                        
-                        ######################################3
-                        # Hombres con pareja  
-                        dataDTcorrect$Subject[ dataDTcorrect$sexo == "Hombre" &   # Selecciono mujeres
-                                                 dataDTcorrect$pareja == "YES" &
-                                                 !(dataDTcorrect$Subject %in% SubjectsFailAccuracyRatio)] %>%
-                          unique %>%  as.character %>% 
-                          sample( size = list_script$n_per_sex_men_pareja, replace = FALSE) ,
-                        
-                        ######################################3  
-                        # Hombres sin pareja  
-                        dataDTcorrect$Subject[ dataDTcorrect$sexo == "Hombre" &   # Selecciono mujeres
-                                                 dataDTcorrect$pareja == "NO" &
-                                                 !(dataDTcorrect$Subject %in% SubjectsFailAccuracyRatio)] %>%
-                          unique %>%  as.character %>% 
-                          sample( size = list_script$n_per_sex_men_no_pareja, replace = FALSE) 
-                        )
   dataDTcorrect$Subject_2_Study <- ifelse( test = dataDTcorrect$Subject %in% Subject_2_Study, 
                                            yes = 1, no = 0)
   
@@ -179,16 +148,12 @@ dataDTcorrect$Out_IQR <-
 # E filters ---------------------------------------------------------------
 
 
-
-
-
-
 # S selection -------------------------------------------------------------
-if( list_script$Subject_2_Study == TRUE){
-  nrow(dataDTcorrect) %>% print
-  dataDTcorrect <- dataDTcorrect[ dataDTcorrect$Subject_2_Study == 1, ]
-  nrow(dataDTcorrect) %>% print
-}
+# if( list_script$Subject_2_Study == TRUE){
+#   nrow(dataDTcorrect) %>% print
+#   dataDTcorrect <- dataDTcorrect[ dataDTcorrect$Subject_2_Study == 1, ]
+#   nrow(dataDTcorrect) %>% print
+# }
 
 if( list_script$Out_rt_300_3000 == TRUE){ 
   (dataDTcorrect$rt_minor_300 != 1 &
@@ -231,30 +196,16 @@ if( list_script$Error_plus_Subject_600 ==  TRUE){# Borg 2010 (Basado en pero no 
   dataDTcorrect[ correct == 0 , response_time :=  meanCorrectblock ]
 }
 
-if( list_script$Only_attribute ==  TRUE){
-  dataDTcorrect <- dataDTcorrect[tipo != "FACEBOOK" ,  ]
-}
+# if( list_script$Only_attribute ==  TRUE){
+#   dataDTcorrect <- dataDTcorrect[tipo != "FACEBOOK" ,  ]
+# }
 
 
 # E selection -------------------------------------------------------------
 
 
 # S Prepare Matrix --------------------------------------------------------
-dataDTcorrect$tipo2 <- NA
-dataDTcorrect$tipo2[  dataDTcorrect$block2 == "Help-FB"  ] <-
-  ifelse(dataDTcorrect$tipo[  dataDTcorrect$block2 == "Help-FB"  ] == "SEXO", yes = "NoInterf", no = "Interf")
-  
-dataDTcorrect$tipo2[  dataDTcorrect$block2 == "Sex-FB"  ] <-
-  ifelse(dataDTcorrect$tipo[  dataDTcorrect$block2 == "Sex-FB"  ] == "HELP", yes = "NoInterf", no = "Interf")
 
-dataDTcorrect$tipo3 <- dataDTcorrect$tipo # Tipo 3 todos los tipos de respuesta FALSE
-                                          # Tipo 2 Los factores juntos TRUE
-
-if( list_script$interfernce_union == TRUE){ # Elijo como hago el analisis
-  dataDTcorrect$tipo <- dataDTcorrect$tipo2
-}else{
-  dataDTcorrect$tipo <- dataDTcorrect$tipo3
-}
 
 ################
 # Compute values
