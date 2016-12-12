@@ -1,5 +1,6 @@
-rm(list = ls());gc()
-
+# rm(list = ls());gc()
+library(data.table)
+library(dplyr)
 load(file = "RData/02_01_check_accuracy_ratio.RData")
 
 
@@ -25,18 +26,19 @@ x[ x$mean_correct >= 0.7, ]$Group %>% table
  x1 <- x[ x$mean_correct < 0.7, ]
  x1
  x1[ , list(min = min(mean_correct) , max = max(mean_correct) , Group = Group[1] ), by = Subject ]
- quitar <- x1$Subject %>% unique 
+ quitar_Sujetos <- x1$Subject %>% unique 
  # E miro por parejas de bloques -------------------------------------------
  
  
 
 
+# S Recuento Correctos ----------------------------------------------------
  x <-
-   dataDT[! Subject %in% quitar , 
+   dataDT[! Subject %in% quitar_Sujetos , 
           list( Subject = Subject[1], Group = Group[1] , mean_correct = round(mean(correct), digits = 2)),
           by = Subject ]
 
  x[, 
         list( tamano_muestra = .N),
         by = Group ] 
- 
+ # E Recuento Correctos ----------------------------------------------------
