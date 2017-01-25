@@ -16,7 +16,7 @@ lapply(X = list_script$needed_script, FUN = function(x){
   library(x, character.only = TRUE)
 })
 
-setwd(dir = list_script$dir_script)
+# setwd(dir = list_script$dir_script)
 
 sessionInfo() 
 Sys.info()

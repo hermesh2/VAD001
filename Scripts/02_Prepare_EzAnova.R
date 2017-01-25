@@ -35,7 +35,7 @@ for( i in list_script$NombreBlock_vector_01){
   data$block2[ data$block == i] <- 
     list_script$NombreBlock_names_01[i]
 }
-data$block2 <-data$block2 %>% factor
+data$block2 <- data$block2 %>% factor
 # table(data$block, data$block2)
 
 data$Subject <-
@@ -53,7 +53,7 @@ dataDT <-
                 list_script$variables_guardadas_01] %>% data.table
 # dataDT %>%  summary
 save(dataDT, file = "RData/02_01_check_accuracy_ratio.RData")
-source("Scripts/aux/02_01_check_accuracy_ratio.R")
+# source("Scripts/aux/02_01_check_accuracy_ratio.R", encoding = "UTF-8")
 ######################################
 #### OUT data checks
 ######################################
@@ -164,5 +164,7 @@ dataDTcorrect$Out_IQR <-
 
 
 # S save ------------------------------------------------------------------
-save(dataDTcorrect , quitar_Sujetos, file = "RData/02_Prepare_Ez_Anova.RData")
+# save(dataDTcorrect , quitar_Sujetos, file = "RData/02_Prepare_Ez_Anova.RData")
+save(dataDTcorrect , file = "RData/02_Prepare_Ez_Anova.RData")
+
 # E save ------------------------------------------------------------------

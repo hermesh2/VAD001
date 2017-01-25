@@ -52,7 +52,7 @@ list <-  list(
 writeLines(text = toJSON(list), con = "Data/00_Initial.json")
 writeLines(text = as.character(sessionInfo()), con = "Results/00_Informacion_sesion.txt")
 
-source("Scripts/02_Prepare_EzAnova.R")
+source("Scripts/02_Prepare_EzAnova.R", encoding = "UTF-8")
 source("Scripts/03_filter.R")
 source("Scripts/04_Prepare_matrix.R")
 
