@@ -149,7 +149,7 @@ data$correct <- data$correct %>%  as.character %>% as.numeric
 
 
 # S save ------------------------------------------------------------------
-save(data, file = "RData/00_read_prepare_data.RData")
+save(data, Times, file = "RData/00_read_prepare_data.RData")
 # E save ------------------------------------------------------------------
 
 Times

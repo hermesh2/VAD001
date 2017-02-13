@@ -23,6 +23,8 @@ sessionInfo()
 Sys.info()
 load("RData/03_filter.RData")
 source("Scripts/Functions/t.test.Comparison.Function.Ch.R")
+source("Scripts/Functions/PlotMeanCh.R")
+
 # E Basics ----------------------------------------------------------------
 
 
@@ -176,13 +178,46 @@ d[ , list( median = median(value) ), by = Group] %>% print
 # Group       mean
 # 1: Grupo control -0.9464425
 # 2:           TDC -0.5427282
-d[ , list( mean = hist(value, main = paste0( "ActionF_", Group[1])) ), by = Group]
-t.test(value ~ Group, data = d, paired = TRUE) %>% print
-t.test.Comparison.Function.Ch(data = data.frame(d), StringResponse = "value", StringFactor = "Group",paired = TRUE ) %>% print
+# d[ , list( mean = hist(value, main = paste0( "ActionF_", Group[1])) ), by = Group]
+shapiro.test(x = d$value)
+shapiro.test(x = d$value[d$Group == "TDC"])
+shapiro.test(x = d$value[d$Group == "Grupo control"])
+ks.test(d$value[d$Group == "TDC"], "pnorm", mean(d$Group == "TDC"), sd(d$Group == "TDC"))
+ks.test(d$value[d$Group == "Grupo control"], "pnorm", mean(d$Group == "Grupo control"), sd(d$Group == "Grupo control"))
+
+t.test(value ~ Group, data = d, paired = F, var.equal = F) %>% print
+t.test.Comparison.Function.Ch(data = data.frame(d), StringResponse = "value", StringFactor = "Group"  ) %>% print
+wilcox.test(x = d$value[ d$Group == "Grupo control"], y =  d$value[d$Group == "TDC"])
+
+p <- ggplot(d, aes(factor(Group), value))
+set.seed(1)
+ggplot_distr <-
+  p + geom_violin(aes(colour =  factor(Group) ) ) +
+    geom_point(aes(colour = factor(Group) ), position= "jitter" ) + 
+    # ggtitle ("") +
+    # xlab("Month") +  ylab ("Average temperature ( ºC )")
+    theme_bw() 
+print(ggplot_distr)
+d[ , Group2 := "CD"]
+d[ Group == "Grupo control", Group2 := "NCD"]
+d[ , .N , Group]
+plotMeanCh(response = d$value, factor1 = factor(d$Group2), col = 1, error.bars = "se", pch = 15:16 , 
+           Xlim = c(0.75, 2.25),
+           lty = 0, xlab = "Group", ylab = "D-measuere",
+           main = "D-Measure PV" )
+grid()
+d_F <- d
+
+cat("\nRT fisico\n")
+d <- dataDT_ez[ measure == "RT" & grepl(pattern = "ActionF", x = variable), ]
+d[ , list( mean = mean(value), sd = sd(value) ), by = Group]  %>%  print
+
 # E Accion Fisica ---------------------------------------------------------
 
 
 # S Accion relacional -----------------------------------------------------
+write.table(x = dataDT_ez[  Block %in% c("D","RT") | measure %in% c("RT")], file = "Results/04_Matriz.csv",sep = ";", dec = ",",row.names = FALSE)
+
 cat("\n================================================\n")
 cat("Valores para Accion relacional")
 cat("\n================================================\n")
@@ -194,8 +229,21 @@ d[ , list( median = median(value) ), by = Group] %>% print
 # 1: Grupo control -1.063566
 # 2:           TDC -1.297336
 d[ , list( mean = hist(value, main = paste0( "ActionR_", Group[1])) ), by = Group]
-t.test(value ~ Group, data = d, paired = TRUE) %>% print
-t.test.Comparison.Function.Ch(data = data.frame(d), StringResponse = "value", StringFactor = "Group",paired = TRUE ) %>% print
+shapiro.test(x = d$value[d$Group == "TDC"])
+shapiro.test(x = d$value[d$Group == "Grupo control"])
+ks.test(d$value[d$Group == "TDC"], "pnorm", mean(d$Group == "TDC"), sd(d$Group == "TDC"))
+ks.test(d$value[d$Group == "Grupo control"], "pnorm", mean(d$Group == "Grupo control"), sd(d$Group == "Grupo control"))
+
+t.test(value ~ Group, data = d, paired = F, var.equal = F) %>% print
+t.test.Comparison.Function.Ch(data = data.frame(d), StringResponse = "value", StringFactor = "Group"  ) %>% print
+wilcox.test(x = d$value[ d$Group == "Grupo control"], y =  d$value[d$Group == "TDC"])
+# t.test(value ~ Group, data = d, paired = FALSE) %>% print
+# t.test.Comparison.Function.Ch(data = data.frame(d), StringResponse = "value", StringFactor = "Group",paired = FALSE ) %>% print
+
+d_R <- d
+cat("\nRT relacional\n")
+d <- dataDT_ez[ measure == "RT" & grepl(pattern = "ActionR", x = variable), ]
+d[ , list( mean = mean(value), sd = sd(value) ), by = Group]  %>%  print
 # E Accion relacional -----------------------------------------------------
 
 
@@ -211,6 +259,35 @@ d[ , list( median = median(value) ), by = Group] %>% print
 # 1: Grupo control 1.0423264
 # 2:           TDC 0.7067977
 d[ , list( mean = hist(value, main = paste0( "Action_", Group[1])) ), by = Group]
-t.test(value ~ Group, data = d, paired = TRUE) %>% print
-t.test.Comparison.Function.Ch(data = data.frame(d), StringResponse = "value", StringFactor = "Group",paired = TRUE ) %>% print
+shapiro.test(x = d$value[d$Group == "TDC"])
+shapiro.test(x = d$value[d$Group == "Grupo control"])
+ks.test(d$value[d$Group == "TDC"], "pnorm", mean(d$Group == "TDC"), sd(d$Group == "TDC"))
+ks.test(d$value[d$Group == "Grupo control"], "pnorm", mean(d$Group == "Grupo control"), sd(d$Group == "Grupo control"))
+
+t.test(value ~ Group, data = d, paired = F, var.equal = F) %>% print
+t.test.Comparison.Function.Ch(data = data.frame(d), StringResponse = "value", StringFactor = "Group"  ) %>% print
+wilcox.test(x = d$value[ d$Group == "Grupo control"], y =  d$value[d$Group == "TDC"])
 # E D accion juntos -------------------------------------------------------
+
+# S ANOVA -----------------------------------------------------------------
+cat("\n================================================\n")
+cat("ANOVA")
+cat("\n================================================\n")
+d <- rbindlist(l =  list(d_F, d_R), use.names = TRUE, fill = TRUE)
+d[ , variable2 := variable %>%  as.character %>% substr(start = 1, stop = 9, .) %>% as.factor]
+d[ , Group :=  factor( Group)]
+d[ , Subject :=  factor( Subject)]
+ezANOVA(
+  data = d
+  , dv = .(value) # Por si las manovas
+  , wid = .(Subject)
+  , within = .(variable2)
+  , between = .(Group)
+) %>% print
+
+plotMeanCh(response = d$value, factor1 = factor(d$Group),factor2 = factor(d$variable) ,col = 1:2, error.bars = "se", pch = 15:16 ,
+           Xlim = c(0.75, 2.25),
+           lty = 1, xlab = "Group", ylab = "D-measuere",
+           main = "D-Measure" )
+lmer( formula = value ~ variable * Group + ( 1|Subject), data = d)
+summary(lme(fixed= value ~ variable * Group, random=   ~ 1|Subject, data=d))

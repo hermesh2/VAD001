@@ -5,7 +5,8 @@ if(! require("rjson")){
 library("rjson")
 
 list <-  list(
-  needed_script = c("dplyr", "data.table", "ez", "ggplot2", "nlme", "lme4", "languageR", "lmerTest", "modeest", "psych"),
+  needed_script = c("dplyr", "data.table", "ez", "ggplot2", "nlme", "lme4", "languageR", "lmerTest", 
+                    "modeest", "psych", "Rcmdr"),
   dir_script = getwd(),
   
   ncol_experiment_01 = 230, # Numero de columnas que tiene el experimento
@@ -15,19 +16,25 @@ list <-  list(
   NombreBlock_names_01 = c("ActionF-Pos","ActionF-Neg","ActionR-Pos","ActionR-Neg"),
   variables_guardadas_01 = c("Subject", "correct", "block", "trial_order", "sexo", "target", "tipo", "block2", "response_time", "Group"),
   
-  seet_seed = 11234, # 112345
+  seet_seed = 112345, # 112345
   min_RT = 300,
   max_RT = 3000,
   IQR_prod = 1.5,
   correct_only_01 = FALSE,             # Si quremeos solo las repuestas correctas
   Ratio_response_Block_01 = 0.7,
-  
-  
+
   Subject_out_01 = 
-    c(119, 203, 210, 212, 316, 318, 100, 101,
-      112, 113, 204, 209, 211, 213, 215, 303,
-      307, 311, 313, 315,  # Estos son por ratio de acierto
+    c(
+      # 119,
+      203,  210,  212,  316,  318,  100,  101,
+      112,  113,  204, 209,
+      211,  213,  215,  303,  307,  311,  313,  315,  
+      # 117, 119, 203, 210, 212, 316, 318, 100, 101,
+      # 112, 113, 204, 209, 211, 213, 215, 303,
+      # 307, 311, 313, 315,  # Estos son por ratio de acierto
       
+      
+      301, 109, 305,# 216, 
       319, 111             # Estos son por ser lentos
       
       ),             # Nos dice si quitmos sujetos
